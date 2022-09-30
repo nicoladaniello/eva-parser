@@ -23,26 +23,40 @@ export default class Eva {
     // Math operations
 
     if (exp[0] === "+") {
-      return this.eval(exp[1]) + this.eval(exp[2]);
+      return this.eval(exp[1], env) + this.eval(exp[2], env);
     }
 
     if (exp[0] === "-") {
-      return this.eval(exp[1]) - this.eval(exp[2]);
+      return this.eval(exp[1], env) - this.eval(exp[2], env);
     }
 
     if (exp[0] === "*") {
-      return this.eval(exp[1]) * this.eval(exp[2]);
+      return this.eval(exp[1], env) * this.eval(exp[2], env);
     }
 
     if (exp[0] === "/") {
-      return this.eval(exp[1]) / this.eval(exp[2]);
+      return this.eval(exp[1], env) / this.eval(exp[2], env);
+    }
+
+    // Blocks
+
+    if (exp[0] === "begin") {
+      const blockEnv = new Environment({}, env);
+      return this._evalBlock(exp, blockEnv);
     }
 
     // Variable declarations
 
     if (exp[0] === "var") {
       const [_, name, value] = exp;
-      return env.define(name, this.eval(value));
+      return env.define(name, this.eval(value, env));
+    }
+
+    // Variable update
+
+    if (exp[0] === "set") {
+      const [_, name, value] = exp;
+      return env.assign(name, this.eval(value, env));
     }
 
     // Variable access
@@ -52,6 +66,20 @@ export default class Eva {
     }
 
     throw `Unimplemented: ${JSON.stringify(exp)}`;
+  }
+
+  /**
+   * Helper function to evaluate nested blocks.
+   */
+  private _evalBlock(block: any, env: Environment) {
+    let result: any;
+    const [_tag, ...expressions] = block;
+
+    expressions.forEach((exp: any) => {
+      result = this.eval(exp, env);
+    });
+
+    return result;
   }
 }
 
