@@ -38,6 +38,24 @@ export default class Eva {
       return this.eval(exp[1], env) / this.eval(exp[2], env);
     }
 
+    // Comparison operators
+
+    if (exp[0] === ">") {
+      return this.eval(exp[1], env) > this.eval(exp[2], env);
+    }
+
+    if (exp[0] === ">=") {
+      return this.eval(exp[1], env) >= this.eval(exp[2], env);
+    }
+
+    if (exp[0] === "<") {
+      return this.eval(exp[1], env) < this.eval(exp[2], env);
+    }
+
+    if (exp[0] === "<=") {
+      return this.eval(exp[1], env) <= this.eval(exp[2], env);
+    }
+
     // Blocks
 
     if (exp[0] === "begin") {
@@ -63,6 +81,16 @@ export default class Eva {
 
     if (isVariableName(exp)) {
       return env.lookup(exp);
+    }
+
+    // IF statement
+
+    if (exp[0] === "if") {
+      const [_tag, condition, consequent, alternate] = exp;
+
+      return this.eval(condition, env)
+        ? this.eval(consequent, env)
+        : this.eval(alternate, env);
     }
 
     throw `Unimplemented: ${JSON.stringify(exp)}`;
