@@ -1,12 +1,9 @@
-import Environment from "../Environment";
 import Eva from "../Eva";
+// @ts-ignore
+import evaParser from "../../parser/evaParser.js";
 
 describe("Eva", () => {
-  const eva = new Eva(
-    new Environment({
-      true: true,
-    })
-  );
+  const eva = new Eva();
 
   it("should evaluate block scopes", () => {
     const actual = eva.eval([
@@ -48,8 +45,17 @@ describe("Eva", () => {
       ["begin", ["set", "data", 100]],
       "data",
     ]);
+  });
 
-    expect(actual).toBe(100);
+  it("should allow nested blocks to modify parent scopes", () => {
+    const exp = evaParser.parse(`
+      (begin
+        (var x 10)
+        (var y 20)
+        (+ (* x 10) y)
+      )
+    `);
+    expect(eva.eval(exp)).toStrictEqual(120);
   });
 
   it("should throw if nested block tries to modify an undefined variable", () => {

@@ -50,3 +50,25 @@ export default class Environment {
     return this._parent.resolve(name);
   }
 }
+
+/**
+ * Default global environment
+ */
+export const GlobalEnvironment = new Environment({
+  true: true,
+  false: false,
+  null: null,
+
+  "+": (opt1: number, opt2: number) => (opt2 === null ? +opt1 : opt1 + opt2),
+  "-": (opt1: number, opt2: number) => (opt2 === null ? -opt1 : opt1 - opt2),
+  "*": (opt1: number, opt2: number) => opt1 * opt2,
+  "/": (opt1: number, opt2: number) => opt1 / opt2,
+
+  ">": (opt1: any, opt2: any) => opt1 > opt2,
+  "<": (opt1: any, opt2: any) => opt1 < opt2,
+  ">=": (opt1: any, opt2: any) => opt1 >= opt2,
+  "<=": (opt1: any, opt2: any) => opt1 <= opt2,
+  "=": (opt1: any, opt2: any) => opt1 === opt2,
+
+  print: console.log,
+});

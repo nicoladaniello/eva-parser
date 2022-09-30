@@ -1,12 +1,7 @@
-import Environment from "../Environment";
 import Eva from "../Eva";
 
 describe("Eva", () => {
-  const eva = new Eva(
-    new Environment({
-      true: true,
-    })
-  );
+  const eva = new Eva();
 
   it("should evaluate variable declarations", () => {
     const actual = eva.eval(["var", "x", 10]);

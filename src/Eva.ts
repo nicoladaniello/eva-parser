@@ -1,5 +1,4 @@
-import { isStringLiteral } from "@babel/types";
-import Environment from "./Environment";
+import Environment, { GlobalEnvironment } from "./Environment";
 
 /**
  * Eva interpreter
@@ -7,7 +6,7 @@ import Environment from "./Environment";
 export default class Eva {
   global: Environment;
 
-  constructor(env = new Environment()) {
+  constructor(env = GlobalEnvironment) {
     this.global = env;
   }
 
@@ -18,42 +17,6 @@ export default class Eva {
 
     if (isString(exp)) {
       return String(exp).slice(1, -1);
-    }
-
-    // Math operations
-
-    if (exp[0] === "+") {
-      return this.eval(exp[1], env) + this.eval(exp[2], env);
-    }
-
-    if (exp[0] === "-") {
-      return this.eval(exp[1], env) - this.eval(exp[2], env);
-    }
-
-    if (exp[0] === "*") {
-      return this.eval(exp[1], env) * this.eval(exp[2], env);
-    }
-
-    if (exp[0] === "/") {
-      return this.eval(exp[1], env) / this.eval(exp[2], env);
-    }
-
-    // Comparison operators
-
-    if (exp[0] === ">") {
-      return this.eval(exp[1], env) > this.eval(exp[2], env);
-    }
-
-    if (exp[0] === ">=") {
-      return this.eval(exp[1], env) >= this.eval(exp[2], env);
-    }
-
-    if (exp[0] === "<") {
-      return this.eval(exp[1], env) < this.eval(exp[2], env);
-    }
-
-    if (exp[0] === "<=") {
-      return this.eval(exp[1], env) <= this.eval(exp[2], env);
     }
 
     // Blocks
@@ -106,6 +69,19 @@ export default class Eva {
       return result;
     }
 
+    // Function calls
+    if (Array.isArray(exp)) {
+      const fn = this.eval(exp[0], env);
+      const args = exp.slice(1).map((arg) => this.eval(arg, env));
+
+      // Native function
+      if (typeof fn === "function") {
+        return fn(...args);
+      }
+
+      // User-defined functions TODO
+    }
+
     throw `Unimplemented: ${JSON.stringify(exp)}`;
   }
 
@@ -133,5 +109,5 @@ function isString(exp: any) {
 }
 
 function isVariableName(exp: any) {
-  return typeof exp === "string" && /^[a-zA-Z][a-zA-Z_]*$/.test(exp);
+  return typeof exp === "string" && /^[+\-*\/<>=a-zA-Z0-9_]*$/.test(exp);
 }
