@@ -83,7 +83,7 @@ export default class Eva {
       return env.lookup(exp);
     }
 
-    // IF statement
+    // If statement
 
     if (exp[0] === "if") {
       const [_tag, condition, consequent, alternate] = exp;
@@ -91,6 +91,19 @@ export default class Eva {
       return this.eval(condition, env)
         ? this.eval(consequent, env)
         : this.eval(alternate, env);
+    }
+
+    // While loop
+
+    if (exp[0] === "while") {
+      const [_tag, condition, body] = exp;
+      let result: any = [];
+
+      while (this.eval(condition, env)) {
+        result = this.eval(body, env);
+      }
+
+      return result;
     }
 
     throw `Unimplemented: ${JSON.stringify(exp)}`;
