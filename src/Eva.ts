@@ -1,5 +1,11 @@
 import Environment, { GlobalEnvironment } from "./Environment";
 
+export type UserFunctionDeclaration = {
+  params: string[];
+  body: any;
+  env: Environment;
+};
+
 /**
  * Eva interpreter
  */
@@ -69,20 +75,55 @@ export default class Eva {
       return result;
     }
 
+    // Function declaration
+    if (exp[0] === "def") {
+      const [_tag, name, params, body] = exp;
+
+      const fn: UserFunctionDeclaration = {
+        params,
+        body,
+        env, // Closure!
+      };
+
+      return env.define(name, fn);
+    }
+
     // Function calls
     if (Array.isArray(exp)) {
       const fn = this.eval(exp[0], env);
       const args = exp.slice(1).map((arg) => this.eval(arg, env));
 
-      // Native function
+      // Native functions
       if (typeof fn === "function") {
         return fn(...args);
       }
 
-      // User-defined functions TODO
+      // User-defined functions
+      const activationRecord: Record<string, any> = {};
+
+      (fn as UserFunctionDeclaration).params.forEach((param, index) => {
+        activationRecord[param] = args[index];
+      });
+
+      const activationEnv = new Environment(
+        activationRecord,
+        fn.env // Static scope
+      );
+
+      return this._evalBody(fn.body, activationEnv);
     }
 
     throw `Unimplemented: ${JSON.stringify(exp)}`;
+  }
+
+  /**
+   * Helper function to evaluate function bodies.
+   */
+  private _evalBody(body: any, env: Environment) {
+    if (body[0] === "begin") {
+      return this._evalBlock(body, env);
+    }
+    return this.eval(body, env);
   }
 
   /**
