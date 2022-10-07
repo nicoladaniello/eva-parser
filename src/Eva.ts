@@ -55,6 +55,34 @@ export default class Eva {
       return env.lookup(exp);
     }
 
+    // Variable increment
+
+    if (exp[0] === "++") {
+      const varExp = this._transformer.transformIncToSet(exp);
+      return this.eval(varExp, env);
+    }
+
+    // Variable addition
+
+    if (exp[0] === "+=") {
+      const varExp = this._transformer.transformPlusEqualToSet(exp);
+      return this.eval(varExp, env);
+    }
+
+    // Variable decrement
+
+    if (exp[0] === "--") {
+      const varExp = this._transformer.transformDecToSet(exp);
+      return this.eval(varExp, env);
+    }
+
+    // Variable subtraction
+
+    if (exp[0] === "-=") {
+      const varExp = this._transformer.transformMinusEqualToSet(exp);
+      return this.eval(varExp, env);
+    }
+
     // If statement
 
     if (exp[0] === "if") {
@@ -90,6 +118,13 @@ export default class Eva {
 
     if (exp[0] === "switch") {
       const ifExp = this._transformer.transformSwitchToIf(exp);
+      return this.eval(ifExp, env);
+    }
+
+    // For loop
+
+    if (exp[0] === "for") {
+      const ifExp = this._transformer.transformForToWhile(exp);
       return this.eval(ifExp, env);
     }
 

@@ -27,4 +27,36 @@ export default class Transformer {
 
     return ifExp;
   }
+
+  transformIncToSet(incExp: any[]) {
+    const [_tag, varName] = incExp;
+    return ["set", varName, ["+", varName, 1]];
+  }
+
+  transformPlusEqualToSet(decExp: any[]) {
+    const [_tag, varName, value] = decExp;
+    return ["set", varName, ["+", varName, value]];
+  }
+
+  transformDecToSet(decExp: any[]) {
+    const [_tag, varName] = decExp;
+    return ["set", varName, ["-", varName, 1]];
+  }
+
+  transformMinusEqualToSet(decExp: any[]) {
+    const [_tag, varName, value] = decExp;
+    return ["set", varName, ["-", varName, value]];
+  }
+
+  transformForToWhile(forExp: any[]) {
+    const [_tag, init, condition, modifier, body] = forExp;
+
+    const whileExp = [
+      "begin",
+      init,
+      ["while", condition, ["begin", body, modifier]],
+    ];
+
+    return whileExp;
+  }
 }
