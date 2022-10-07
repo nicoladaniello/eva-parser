@@ -76,29 +76,43 @@ export default class Eva {
     }
 
     // Function declaration
+
     if (exp[0] === "def") {
       const [_tag, name, params, body] = exp;
 
-      const fn: UserFunctionDeclaration = {
+      // JIT transpile to a variable declaration.
+
+      const varExp = ["var", name, ["lambda", params, body]];
+
+      return this.eval(varExp, env);
+    }
+
+    // Lambda functions
+
+    if (exp[0] === "lambda") {
+      const [_tag, params, body] = exp;
+
+      return {
         params,
         body,
         env, // Closure!
-      };
-
-      return env.define(name, fn);
+      } as UserFunctionDeclaration;
     }
 
     // Function calls
+
     if (Array.isArray(exp)) {
       const fn = this.eval(exp[0], env);
       const args = exp.slice(1).map((arg) => this.eval(arg, env));
 
       // Native functions
+
       if (typeof fn === "function") {
         return fn(...args);
       }
 
       // User-defined functions
+
       const activationRecord: Record<string, any> = {};
 
       (fn as UserFunctionDeclaration).params.forEach((param, index) => {
