@@ -1,4 +1,5 @@
 import Environment, { GlobalEnvironment } from "./Environment";
+import Transformer from "./transform/Transformer";
 
 export type UserFunctionDeclaration = {
   params: string[];
@@ -10,10 +11,12 @@ export type UserFunctionDeclaration = {
  * Eva interpreter
  */
 export default class Eva {
-  global: Environment;
+  public readonly global: Environment;
+  private readonly _transformer: Transformer;
 
   constructor(env = GlobalEnvironment) {
     this.global = env;
+    this._transformer = new Transformer();
   }
 
   eval(exp: any, env = this.global): any {
@@ -78,13 +81,16 @@ export default class Eva {
     // Function declaration
 
     if (exp[0] === "def") {
-      const [_tag, name, params, body] = exp;
-
       // JIT transpile to a variable declaration.
-
-      const varExp = ["var", name, ["lambda", params, body]];
-
+      const varExp = this._transformer.transformDefToVarLambda(exp);
       return this.eval(varExp, env);
+    }
+
+    // Switch statement
+
+    if (exp[0] === "switch") {
+      const ifExp = this._transformer.transformSwitchToIf(exp);
+      return this.eval(ifExp, env);
     }
 
     // Lambda functions
