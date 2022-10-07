@@ -1,5 +1,5 @@
 import Eva from "../Eva";
-import parser from "../../parser";
+import parser from "../parser";
 
 describe("Eva", () => {
   const eva = new Eva();

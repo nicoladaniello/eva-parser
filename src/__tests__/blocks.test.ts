@@ -1,11 +1,11 @@
-import evaParser from "../../parser/evaParser.js";
+import parser from "../parser";
 import Eva from "../Eva";
 
 describe("Eva", () => {
   const eva = new Eva();
 
   it("should evaluate block scopes", () => {
-    const exp = evaParser.parse(`
+    const exp = parser.parse(`
       (begin
         (var x 10)  
         (var y 20)  
@@ -17,7 +17,7 @@ describe("Eva", () => {
   });
 
   it("should evaluate nested blocks", () => {
-    const exp = evaParser.parse(`
+    const exp = parser.parse(`
       (begin
         (var x 10)
         (begin
@@ -31,7 +31,7 @@ describe("Eva", () => {
   });
 
   it("should allow nested blocks to access parent scopes", () => {
-    const exp = evaParser.parse(`
+    const exp = parser.parse(`
       (begin
         (var value 10)
         (var result (begin
@@ -46,7 +46,7 @@ describe("Eva", () => {
   });
 
   it("should allow nested blocks to modify parent scopes", () => {
-    const exp = evaParser.parse(`
+    const exp = parser.parse(`
       (begin
         (var data 10)
         (begin
@@ -60,7 +60,7 @@ describe("Eva", () => {
   });
 
   it("should allow nested blocks to modify parent scopes", () => {
-    const exp = evaParser.parse(`
+    const exp = parser.parse(`
       (begin
         (var x 10)
         (var y 20)
@@ -71,7 +71,7 @@ describe("Eva", () => {
   });
 
   it("should throw if nested block tries to modify an undefined variable", () => {
-    const exp = evaParser.parse(`
+    const exp = parser.parse(`
       (begin
         (begin
           (set data 100)

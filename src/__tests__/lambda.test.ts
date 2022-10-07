@@ -1,4 +1,4 @@
-import parser from "../../parser";
+import parser from "../parser";
 import Eva from "../Eva";
 
 describe("Eva", () => {
