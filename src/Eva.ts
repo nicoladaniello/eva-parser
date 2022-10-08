@@ -45,8 +45,20 @@ export default class Eva {
     // Variable update
 
     if (exp[0] === "set") {
-      const [_, name, value] = exp;
-      return env.assign(name, this.eval(value, env));
+      const [_, ref, value] = exp;
+
+      // Assignment to a property
+
+      if (ref[0] === "prop") {
+        const [_tag, instance, propName] = ref;
+        const instanceEnv: Environment = this.eval(instance, env);
+
+        return instanceEnv.define(propName, this.eval(value, env));
+      }
+
+      // Simple assignment
+
+      return env.assign(ref, this.eval(value, env));
     }
 
     // Variable access
@@ -140,6 +152,41 @@ export default class Eva {
       } as UserFunctionDeclaration;
     }
 
+    // Class declaration
+
+    if (exp[0] === "class") {
+      const [_tag, name, parent, body] = exp;
+      const parentEnv = this.eval(parent, env) || env;
+      const classEnv = new Environment({}, parentEnv);
+
+      this._evalBody(body, classEnv);
+
+      return env.define(name, classEnv);
+    }
+
+    // Class instantiation
+
+    if (exp[0] === "new") {
+      const classEnv = this.eval(exp[1], env);
+      const instanceEnv = new Environment({}, classEnv);
+      const args = exp.slice(2).map((arg: any) => this.eval(arg, env));
+
+      this._callUserDefinedFunction(classEnv.lookup("constructor"), [
+        instanceEnv,
+        ...args,
+      ]);
+
+      return instanceEnv;
+    }
+
+    // Property access
+
+    if (exp[0] === "prop") {
+      const [_tag, instance, name] = exp;
+      const instanceEnv: Environment = this.eval(instance, env);
+      return instanceEnv.lookup(name);
+    }
+
     // Function calls
 
     if (Array.isArray(exp)) {
@@ -154,21 +201,28 @@ export default class Eva {
 
       // User-defined functions
 
-      const activationRecord: Record<string, any> = {};
-
-      (fn as UserFunctionDeclaration).params.forEach((param, index) => {
-        activationRecord[param] = args[index];
-      });
-
-      const activationEnv = new Environment(
-        activationRecord,
-        fn.env // Static scope
-      );
-
-      return this._evalBody(fn.body, activationEnv);
+      return this._callUserDefinedFunction(fn, args);
     }
 
     throw `Unimplemented: ${JSON.stringify(exp)}`;
+  }
+
+  /**
+   * Helper function to run user defined functions.
+   */
+  private _callUserDefinedFunction(fn: UserFunctionDeclaration, args: any[]) {
+    const activationRecord: Record<string, any> = {};
+
+    fn.params.forEach((param, index) => {
+      activationRecord[param] = args[index];
+    });
+
+    const activationEnv = new Environment(
+      activationRecord,
+      fn.env // Static scope
+    );
+
+    return this._evalBody(fn.body, activationEnv);
   }
 
   /**
