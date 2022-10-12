@@ -19,6 +19,16 @@ export default class Eva {
     this._transformer = new Transformer();
   }
 
+  /**
+   * Evaluates global code wrapper into a block.
+   */
+  evalGlobal(exp: any) {
+    return this._evalBlock(["begin", exp], this.global);
+  }
+
+  /**
+   * Evaluates an expression in the given environment.
+   */
   eval(exp: any, env = this.global): any {
     if (isNumber(exp)) {
       return exp;
@@ -162,6 +172,13 @@ export default class Eva {
       this._evalBody(body, classEnv);
 
       return env.define(name, classEnv);
+    }
+
+    // Super expression
+
+    if (exp[0] === "super") {
+      const [_tag, className] = exp;
+      return this.eval(className, env).parent;
     }
 
     // Class instantiation

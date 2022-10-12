@@ -4,11 +4,11 @@ export type Record = { [name: string]: any };
  */
 export default class Environment {
   public record: Record;
-  private _parent: Environment | null;
+  public parent: Environment | null;
 
   constructor(record: Record = {}, parent: Environment | null = null) {
     this.record = record;
-    this._parent = parent;
+    this.parent = parent;
   }
   /**
    * Create a variable with the given name and value.
@@ -43,11 +43,11 @@ export default class Environment {
       return this;
     }
 
-    if (this._parent === null) {
+    if (this.parent === null) {
       throw new ReferenceError(`Variable "${name}" is not defined.`);
     }
 
-    return this._parent.resolve(name);
+    return this.parent.resolve(name);
   }
 }
 
