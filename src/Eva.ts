@@ -1,5 +1,7 @@
 import Environment, { GlobalEnvironment } from "./Environment";
 import Transformer from "./transform/Transformer";
+import parser from "./parser";
+import * as fs from "fs";
 
 export type UserFunctionDeclaration = {
   params: string[];
@@ -210,6 +212,17 @@ export default class Eva {
       const moduleEnv = new Environment({}, env);
       this._evalBody(body, moduleEnv);
       return env.define(name, moduleEnv);
+    }
+
+    // Imports
+    if (exp[0] === "import") {
+      const [_tag, name] = exp;
+
+      const moduleSrc = fs.readFileSync(`${__dirname}/modules/${name}.eva`, "utf-8");
+      const body = parser.parse(`(begin ${moduleSrc})`);
+      const moduleExp = ["module", name, body];
+
+      return this.eval(moduleExp, this.global);
     }
 
     // Function calls

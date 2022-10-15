@@ -1,0 +1,12 @@
+(def abs (value)
+    (if (< value 0)
+        (- value)
+        (value)
+    )
+)
+
+(def square (value)
+    (* value value)
+)
+
+(var PI 31415)
