@@ -59,8 +59,8 @@ export const GlobalEnvironment = new Environment({
   false: false,
   null: null,
 
-  "+": (opt1: number, opt2: number) => (opt2 === null ? +opt1 : opt1 + opt2),
-  "-": (opt1: number, opt2: number) => (opt2 === null ? -opt1 : opt1 - opt2),
+  "+": (opt1: number, opt2: number) => (opt2 == null ? +opt1 : opt1 + opt2),
+  "-": (opt1: number, opt2: number) => (opt2 == null ? -opt1 : opt1 - opt2),
   "*": (opt1: number, opt2: number) => opt1 * opt2,
   "/": (opt1: number, opt2: number) => opt1 / opt2,
 

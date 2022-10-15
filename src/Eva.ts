@@ -23,7 +23,7 @@ export default class Eva {
    * Evaluates global code wrapper into a block.
    */
   evalGlobal(exp: any) {
-    return this._evalBlock(["begin", exp], this.global);
+    return this._evalBody(exp, this.global);
   }
 
   /**
@@ -204,6 +204,14 @@ export default class Eva {
       return instanceEnv.lookup(name);
     }
 
+    // Modules
+    if (exp[0] === "module") {
+      const [_tag, name, body] = exp;
+      const moduleEnv = new Environment({}, env);
+      this._evalBody(body, moduleEnv);
+      return env.define(name, moduleEnv);
+    }
+
     // Function calls
 
     if (Array.isArray(exp)) {
@@ -249,6 +257,7 @@ export default class Eva {
     if (body[0] === "begin") {
       return this._evalBlock(body, env);
     }
+
     return this.eval(body, env);
   }
 
