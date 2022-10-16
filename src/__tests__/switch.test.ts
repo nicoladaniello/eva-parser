@@ -1,23 +1,20 @@
-import parser from "../parser";
+import { evalGlobal } from "./utils";
 import Eva from "../Eva";
 
 describe("Eva", () => {
   const eva = new Eva();
 
   it("should evaluate switch statement", () => {
-    const exp = parser.parse(`
-        (begin
+    const exp = `
+      (var x 10)
+      
+      (switch 
+          ((= x 10) 100)
+          ((> x 10) 200)
+          (else 300)
+      )
+    `;
 
-            (var x 10)
-            
-            (switch 
-                ((= x 10) 100)
-                ((> x 10) 200)
-                (else 300)
-            )
-        )
-    `);
-
-    expect(eva.eval(exp)).toBe(100);
+    expect(evalGlobal(exp, eva)).toBe(100);
   });
 });

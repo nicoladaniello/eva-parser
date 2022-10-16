@@ -1,21 +1,20 @@
 import Eva from "../Eva";
-import parser from "../parser";
+import { evalGlobal } from "./utils";
 
 describe("Eva", () => {
   const eva = new Eva();
 
   it("shoud evaluate for loops", () => {
-    const exp = parser.parse(`
-      (begin
+    const exp = `
+      (var y 0)
 
-        (var y 0)
-        
-        (for (var x 0) (< x 10) (++ x) (set y (+ y x)) )
-
-        y
+      (for (var x 0) (< x 10) (++ x) 
+        (set y (+ y x))
       )
-    `);
 
-    expect(eva.eval(exp)).toBe(45);
+      y
+    `;
+
+    expect(evalGlobal(exp, eva)).toBe(45);
   });
 });
