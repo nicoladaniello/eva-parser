@@ -1,40 +1,32 @@
-import parser from "../parser";
 import Eva from "../Eva";
+import { evalGlobal } from "./utils";
 
 describe("Eva", () => {
   const eva = new Eva();
 
   it("should evaluate module methods", () => {
-    const exp = parser.parse(`
-        (begin
-            (import Math)
-
-            ((prop Math abs) (- 10))
-        )
-    `);
-    expect(eva.evalGlobal(exp)).toBe(10);
+    const exp = `
+      (import Math)
+      ((prop Math abs) (- 10))
+    `;
+    expect(evalGlobal(exp, eva)).toBe(10);
   });
 
   it("should assign module method to variable", () => {
-    const exp = parser.parse(`
-        (begin
-            (import Math)
+    const exp = `
+      (import Math)
 
-            (var abs (prop Math abs))
-            (abs (- 10))
-        )
-    `);
-    expect(eva.evalGlobal(exp)).toBe(10);
+      (var abs (prop Math abs))
+      (abs (- 10))
+    `;
+    expect(evalGlobal(exp, eva)).toBe(10);
   });
 
   it("should evaluate module constants", () => {
-    const exp = parser.parse(`
-        (begin
-            (import Math)
-            
-            (prop Math PI)
-        )
-    `);
-    expect(eva.evalGlobal(exp)).toBe(31415);
+    const exp = `
+      (import Math)
+      (prop Math PI)
+    `;
+    expect(evalGlobal(exp, eva)).toBe(31415);
   });
 });
