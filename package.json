@@ -4,6 +4,7 @@
   "description": "Eva interpreter",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "test": "jest"
   },
   "author": "Nicola D'Aniello",

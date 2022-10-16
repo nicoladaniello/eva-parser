@@ -1,1 +1,1 @@
-export function parse(string: string): any;
+export declare function parse(string: string): any;
